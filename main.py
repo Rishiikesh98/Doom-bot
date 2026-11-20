@@ -7,6 +7,7 @@ from telegram import Bot
 TOKEN = os.environ["TELEGRAM_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 TARGET_URL = os.environ.get("TARGET_URL", "").strip()
+PROXY_URL = os.environ.get("PROXY_URL", "").strip()
 KEYWORDS = [
     x.strip().lower()
     for x in os.environ.get("ALERT_KEYWORDS", "avengers doomsday,doomsday").split(",")
@@ -27,10 +28,12 @@ HEADERS = {
 def check_page():
     if not TARGET_URL:
         return "No monitoring URL configured."
+    proxies = {"http": PROXY_URL, "https": PROXY_URL} if PROXY_URL else None
     r = requests.get(
         TARGET_URL,
         impersonate="chrome",
         headers=HEADERS,
+        proxies=proxies,
         timeout=25,
     )
     r.raise_for_status()
@@ -67,3 +70,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+    
